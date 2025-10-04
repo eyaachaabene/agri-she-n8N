@@ -1,0 +1,284 @@
+{
+  "name": "agrishe",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.humidity_values }}",
+        "options": {
+          "systemMessage": "You are an agriculture assistant specialized in irrigation management.  \nYou receive two types of inputs:  \n1. An array of soil humidity values (0–4095, where lower values mean drier soil).  \n2. Weather forecast data from the OpenWeather API.  \n\nYour job is to decide if irrigation is needed.  \nRules:  \n- If the average soil humidity indicates dryness (below a reasonable threshold, e.g. 1500–2000), consider irrigation.  \n- If rain is forecasted in the next 2 days, avoid irrigation unless the soil is critically dry.  \n- Provide a short and practical recommendation: \"Irrigate\" or \"Do not irrigate,\" followed by a one-sentence explanation.  \n-respond with 2 outputs one containing a short yes or no and one containing the full message "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "cf75adfe-10af-41ab-a59a-775a1f7ce116",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "cityName": "Sfax"
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [
+        380,
+        220
+      ],
+      "id": "42a522ea-1e6a-498c-b61a-5db309d04d3c",
+      "name": "OpenWeatherMap",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "NdDbWpPpm1ZTTuzk",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "21f7ea0d-be62-43b2-9fe5-e575f6e047f8",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fd2b1874-048e-4dd9-8c37-0931e00d3850",
+      "name": "Webhook",
+      "webhookId": "21f7ea0d-be62-43b2-9fe5-e575f6e047f8"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-r1-distill-llama-70b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        140,
+        220
+      ],
+      "id": "4964ba47-87fc-4905-83c0-c8ed2bd370d6",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "EHLUkdnixJjfH3sS",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.3,
+      "position": [
+        580,
+        0
+      ],
+      "id": "67dae842-c659-48d5-bb15-82e85d4c4283",
+      "name": "Respond to Webhook",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ff57dff2-d500-4831-81a7-790bcbba5579",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        520
+      ],
+      "id": "46e5de8b-8b7b-4ceb-8c59-9a6345ba3900",
+      "name": "Webhook1",
+      "webhookId": "ff57dff2-d500-4831-81a7-790bcbba5579"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.message }}",
+        "options": {
+          "systemMessage": "You are a tunisian agriculture  helpful assistant. you will use user data to answer his questions and respond with tunisian language"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        120,
+        520
+      ],
+      "id": "b59fca91-9ad7-4fd3-bcc1-48e89d01f6fb",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-r1-distill-llama-70b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        60,
+        760
+      ],
+      "id": "95af7371-50aa-4d57-a19f-16e26f8767c2",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "EHLUkdnixJjfH3sS",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collection": "orders",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDbTool",
+      "typeVersion": 1.1,
+      "position": [
+        420,
+        740
+      ],
+      "id": "822b21e9-e100-47fb-acbf-c02fa8472e18",
+      "name": "MongoDB",
+      "credentials": {
+        "mongoDb": {
+          "id": "C0IGlodFLrycvs4v",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        520
+      ],
+      "id": "979a5688-feaf-42a2-a3be-074cde3926c6",
+      "name": "Respond to Webhook1",
+      "alwaysOutputData": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenWeatherMap": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "08dc208a-6d21-4264-bf42-e042176c6194",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4cac4657552308f1780edba6184b7a03626eb0b439ee29334ce33c67018ceac0"
+  },
+  "id": "ftB6xWJrSvuIz0lU",
+  "tags": []
+}
